@@ -1,0 +1,58 @@
+<!DOCTYPE html>                                                                                                                                                                                                                                 <html>                                                                                                                  <head>                                                                                                                  <title>Upload new File</title>                                                                                          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
+<script>
+            $(function () {
+                $('.upload').on('click', function (evt) {
+                    var formData = new FormData();
+                    formData.append("file", $(".file")[0].files[0]);
+                    var progressBar = document.getElementById('prog');
+                    var progressValue = document.getElementById('pv');
+                    var progressDone = document.getElementById('done');
+                    var progressSize = document.getElementById('size');
+                    $.ajax({
+                        url: '/',
+                        type: 'POST',
+                        processData: false,
+                        contentType: false,
+                        async: true,
+                        data: formData,
+                        xhr : function(){
+                            XHR = $.ajaxSettings.xhr();                                                                                             if(XHR.upload){                                                                                                             XHR.upload.addEventListener('progress',function(e){
+                                    var progVal = parseInt(e.loaded/e.total*10000)/100 ;                                                                    progressBar.value = progVal;
+                                    progressValue.innerHTML = progVal + '%, ';
+                                    progressDone.innerHTML = parseInt(e.loaded / 1000000) + 'MB / ';
+                                    progressSize.innerHTML = parseInt(e.total / 1000000) + 'MB';
+
+                                }, false);
+                            }
+                            return XHR;
+                        },
+                        success: function (data) {
+                            console.log(data);
+                            $('.message').append('success\n');
+                        },
+                        error: function () {
+                            $('.message').append('failure\n')
+                        }
+                    });
+                });
+            });
+        </script>
+</head>
+
+<body>
+<h1>Upload new File</h1>
+        <input class="file" type="file" name="file" /><br />
+        <input class="upload" type="button" value="upload" />
+        <div class="message"></div>
+        <progress value="0" id="prog" max=100></progress>(<span id="pv" style="color:#00b200">0%</span><span id="done"></span><span id="size"></span>)
+
+<!--
+<form method=post enctype=multipart/form-data>
+    <input type=file name=file>
+      <input type=submit value=Upload>
+</form>
+<--!>
+</body>
+
+</html>
